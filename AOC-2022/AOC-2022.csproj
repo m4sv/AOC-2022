@@ -10,10 +10,12 @@
 
   <ItemGroup>
     <Compile Remove="Day 1.cs" />
+    <Compile Remove="Day 2.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Day 1.cs" />
+    <None Include="Day 2.cs" />
   </ItemGroup>
 
   <ItemGroup>
