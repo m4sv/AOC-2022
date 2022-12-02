@@ -9,8 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Day 1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Day 1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="inputs\01.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inputs\02.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
