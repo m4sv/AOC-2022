@@ -45,7 +45,8 @@ public class Day7
                 var items = line.Split(' ');
                 if (!directory.ContainsKey(items[1]))
                 {
-                    directory.Add(items[1], new Dir(currentDir));
+                    if (currentDir == "root/") directory.Add($"{currentDir}{items[1]}", new Dir(currentDir));
+                    else directory.Add($"{currentDir}/{items[1]}", new Dir(currentDir));
                 }
             }
             else
