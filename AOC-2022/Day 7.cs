@@ -11,12 +11,6 @@ public class Day7
         var line = inputStream.ReadLine();
         while (!string.IsNullOrWhiteSpace(line))
         {
-            //var currentFolder = "root";
-            if (currentDir != "root/")
-            {
-                //var elements = currentDir.Split('/');
-                //currentFolder = elements.LastOrDefault() ?? "root";
-            }
             if (line.StartsWith("$ cd"))
             {
                 var parseValue = line.Split(' ')[2];
@@ -24,10 +18,7 @@ public class Day7
                 {
                     currentDir = currentDir.Replace($"/{currentDir.Split("/").LastOrDefault()}", "");
                 }
-                else if (parseValue == "/")
-                {
-                    currentDir = "root/";
-                }
+                else if (parseValue == "/") currentDir = "root/";
                 else
                 {
                     if (currentDir != "root/") currentDir += $"/{parseValue}";
@@ -67,22 +58,72 @@ public class Day7
             }
             item.Value.populateFileSizes();
         }
-
-        var sizes = directory.Select(x => new KeyValuePair<string,int>(x.Key,x.Value.GetDirectorySize())).ToList();
-        var size2 = directory.Select(x => new KeyValuePair<string, int>(x.Key, x.Value.Children.Count())).OrderBy(x=> x.Value).ToList();
         var result = directory.Select(x => x.Value.GetDirectorySize()).Where(x => x <= 100000).Sum();
-
         Console.WriteLine(result);
     }
 
     public static void Part2()
     {
         var inputStream = new StreamReader("inputs/07.txt");
+        string currentDir = "/";
+
         var line = inputStream.ReadLine();
         while (!string.IsNullOrWhiteSpace(line))
         {
+            if (line.StartsWith("$ cd"))
+            {
+                var parseValue = line.Split(' ')[2];
+                if (parseValue == ".." && currentDir != "root/")
+                {
+                    currentDir = currentDir.Replace($"/{currentDir.Split("/").LastOrDefault()}", "");
+                }
+                else if (parseValue == "/") currentDir = "root/";
+                else
+                {
+                    if (currentDir != "root/") currentDir += $"/{parseValue}";
+                    else currentDir += parseValue;
+                }
+            }
+            else if (line.StartsWith("$ ls"))
+            {
+                if (!directory.ContainsKey(currentDir)) directory.Add(currentDir, new Dir(currentDir));
+                line = inputStream.ReadLine();
+                continue;
+            }
+            else if (line.StartsWith("dir"))
+            {
+                var items = line.Split(' ');
+                if (!directory.ContainsKey(items[1]))
+                {
+                    if (currentDir == "root/") directory.Add($"{currentDir}{items[1]}", new Dir(currentDir));
+                    else directory.Add($"{currentDir}/{items[1]}", new Dir(currentDir));
+                }
+            }
+            else
+            {
+                var items = line.Split(' ');
+                int.TryParse(items[0], out int itemSize);
+                var name = items[1];
+                directory[currentDir].Files.Add(new DirFile { Name = name, Size = itemSize });
+            }
             line = inputStream.ReadLine();
         }
+
+        foreach (var item in directory)
+        {
+            if (item.Value.ParentName != null)
+            {
+                directory[item.Value.ParentName].Children.Add(item.Value);
+            }
+            item.Value.populateFileSizes();
+        }
+
+        var totalDir = directory.Sum(x => x.Value.Size);
+        var remainingSpace = 70000000 - totalDir;
+
+        var itemvalues = directory.Skip(1).OrderByDescending(x => x.Value.Size);
+        var result = itemvalues.Where(x => x.Value.Size + remainingSpace >= 30000000).OrderBy(x=> x.Value.Size).FirstOrDefault();
+        Console.WriteLine(result.Value.Size);
     }
 
     public class Dir
