@@ -6,29 +6,37 @@ public class Day7
     public static void Part1()
     {
         var inputStream = new StreamReader("inputs/07.txt");
-        string currentDirectory = null, parentDirectory = "/";
+        string currentDir = "/";
+
         var line = inputStream.ReadLine();
         while (!string.IsNullOrWhiteSpace(line))
         {
+            //var currentFolder = "root";
+            if (currentDir != "root/")
+            {
+                //var elements = currentDir.Split('/');
+                //currentFolder = elements.LastOrDefault() ?? "root";
+            }
             if (line.StartsWith("$ cd"))
             {
                 var parseValue = line.Split(' ')[2];
-                if (parseValue == "..")
+                if (parseValue == ".." && currentDir != "root/")
                 {
-                    currentDirectory = directory[currentDirectory].ParentName;
+                    currentDir = currentDir.Replace($"/{currentDir.Split("/").LastOrDefault()}", "");
+                }
+                else if (parseValue == "/")
+                {
+                    currentDir = "root/";
                 }
                 else
                 {
-                    currentDirectory = parseValue;
-                    if (!directory.ContainsKey(currentDirectory))
-                    {
-                        directory.Add(currentDirectory, new Dir(parentDirectory));
-                    }
-                    parentDirectory = currentDirectory;
+                    if (currentDir != "root/") currentDir += $"/{parseValue}";
+                    else currentDir += parseValue;
                 }
             }
             else if (line.StartsWith("$ ls"))
             {
+                if(!directory.ContainsKey(currentDir)) directory.Add(currentDir, new Dir(currentDir));
                 line = inputStream.ReadLine();
                 continue;
             }
@@ -37,7 +45,7 @@ public class Day7
                 var items = line.Split(' ');
                 if (!directory.ContainsKey(items[1]))
                 {
-                    directory.Add(items[1], new Dir(currentDirectory));
+                    directory.Add(items[1], new Dir(currentDir));
                 }
             }
             else
@@ -45,7 +53,7 @@ public class Day7
                 var items = line.Split(' ');
                 int.TryParse(items[0], out int itemSize);
                 var name = items[1];
-                directory[currentDirectory].Files.Add(new DirFile { Name = name, Size = itemSize });
+                directory[currentDir].Files.Add(new DirFile { Name = name, Size = itemSize });
             }
             line = inputStream.ReadLine();
         }
@@ -59,6 +67,8 @@ public class Day7
             item.Value.populateFileSizes();
         }
 
+        var sizes = directory.Select(x => new KeyValuePair<string,int>(x.Key,x.Value.GetDirectorySize())).ToList();
+        var size2 = directory.Select(x => new KeyValuePair<string, int>(x.Key, x.Value.Children.Count())).OrderBy(x=> x.Value).ToList();
         var result = directory.Select(x => x.Value.GetDirectorySize()).Where(x => x <= 100000).Sum();
 
         Console.WriteLine(result);
