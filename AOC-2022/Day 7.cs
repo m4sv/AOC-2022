@@ -119,11 +119,12 @@ public class Day7
         }
 
         var totalDir = directory.Sum(x => x.Value.Size);
-        var remainingSpace = 70000000 - totalDir;
+        var neededSpace = 30000000 - (70000000 - totalDir);
 
         var itemvalues = directory.Skip(1).OrderByDescending(x => x.Value.Size);
-        var result = itemvalues.Where(x => x.Value.Size + remainingSpace >= 30000000).OrderBy(x=> x.Value.Size).FirstOrDefault();
-        Console.WriteLine(result.Value.Size);
+        var result = itemvalues.Select(x => x.Value.GetDirectorySize()).Where(x=> x > neededSpace).OrderBy(x=>x).FirstOrDefault();
+
+        Console.WriteLine(result);
     }
 
     public class Dir
