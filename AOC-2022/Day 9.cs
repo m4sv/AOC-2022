@@ -9,8 +9,9 @@ public class Day9
         var line = inputStream.ReadLine();
         while (!string.IsNullOrWhiteSpace(line))
         {
-            var direction = line[0];
-            var distance = line[2]-48;
+            var parse = line.Split(' ');
+            var direction = parse[0];
+            var distance = int.Parse(parse[1]);
             rope.Move(direction, distance);
             line = inputStream.ReadLine();
         }
@@ -30,22 +31,22 @@ public class Day9
             Head = new Point();
             Tail = new Point();
             LastHead = new Point();
-            TailLocations = new List<Point>();
+            TailLocations = new HashSet<Point>();
         }
         public Point Head { get; set; }
         public Point Tail { get; set; }
 
         Point LastHead { get; set; }
-        public void Move(char direction, int distance)
+        public void Move(string direction, int distance)
         {
             int xDir = 0;
             int yDir = 0;
             switch (direction)
             {
-                case 'L': xDir = -1; break;
-                case 'R': xDir = 1; break;
-                case 'U': yDir = 1; break;
-                case 'D': yDir =  -1; break;
+                case "L": xDir = -1; break;
+                case "R": xDir = 1; break;
+                case "U": yDir = 1; break;
+                case "D": yDir =  -1; break;
             }
             for (var i = 0; i < distance; i++)
             {
@@ -55,12 +56,13 @@ public class Day9
                 ResolveTail();
             }
         }
-        void ResolveTail()
+        public void ResolveTail()
         {
-            if(!Head.isAdjacent(Tail))
+            var xDist = Head.x - Tail.x;
+            var yDist = Head.y - Tail.y;
+            var distance = Math.Sqrt(Math.Pow(xDist, 2) + Math.Pow(yDist, 2));
+            if (distance >=2)
             {
-                var xDist = Head.x - Tail.x;
-                var yDist = Head.y - Tail.y;
                 if (xDist != 0 && yDist != 0)
                 {
                     Tail.x = LastHead.x;
@@ -72,7 +74,7 @@ public class Day9
             TailLocations.Add(new Point(Tail));
         }
 
-        public List<Point> TailLocations { get; set; }
+        public HashSet<Point> TailLocations { get; set; }
     }
 
     public class Point
