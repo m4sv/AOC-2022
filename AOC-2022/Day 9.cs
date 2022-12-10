@@ -108,7 +108,6 @@ public class Day9
             {
                 var xDist = previousKnot.x - CutTail[i].x;
                 var yDist = previousKnot.y - CutTail[i].y;
-                var distance = Math.Sqrt(Math.Pow(xDist, 2) + Math.Pow(yDist, 2));
                 if (!previousKnot.isAdjacent(CutTail[i]))
                 {
                     if (xDist != 0) CutTail[i].x += Math.Sign(xDist);
